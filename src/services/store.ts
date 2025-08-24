@@ -5,11 +5,13 @@ import {
   useDispatch as dispatchHook,
   useSelector as selectorHook
 } from 'react-redux';
+
 import authReducer from './slices/authSlice';
+import ingredientsReducer from './slices/ingredientsSlice';
 
 const rootReducer = combineReducers({
-  auth: authReducer
-  // ingredients: ingredientsReducer
+  auth: authReducer,
+  ingredients: ingredientsReducer
   // order: orderReducer
   // feed: feedReducer и тд
 });
@@ -23,7 +25,7 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 export type AppDispatch = typeof store.dispatch;
 
-export const useDispatch: () => AppDispatch = () => dispatchHook();
+export const useDispatch = () => dispatchHook<AppDispatch>();
 export const useSelector: TypedUseSelectorHook<RootState> = selectorHook;
 
 export default store;
