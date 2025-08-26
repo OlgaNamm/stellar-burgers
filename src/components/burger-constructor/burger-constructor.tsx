@@ -1,40 +1,53 @@
 import { FC, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from '../../services/store';
+import {
+  selectConstructorBun,
+  selectConstructorIngredients
+} from '../../services/selectors/constructorSelectors';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 
 export const BurgerConstructor: FC = () => {
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: null as TConstructorIngredient | null,
-    ingredients: [] as TConstructorIngredient[]
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const bun = useSelector(selectConstructorBun);
+  const ingredients = useSelector(selectConstructorIngredients);
+
+  const safeConstructorItems = {
+    bun: bun || null,
+    ingredients: ingredients || []
   };
 
   const orderRequest = false;
-
   const orderModalData = null;
 
   const onOrderClick = () => {
-    if (!constructorItems.bun || orderRequest) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (!safeConstructorItems.bun || orderRequest) return;
+    // TODO: логика оформления заказа
   };
+
   const closeOrderModal = () => {};
 
   const price = useMemo(
     () =>
-      (constructorItems.bun ? constructorItems.bun.price * 2 : 0) +
-      constructorItems.ingredients.reduce(
+      (safeConstructorItems.bun ? safeConstructorItems.bun.price * 2 : 0) +
+      safeConstructorItems.ingredients.reduce(
         (s: number, v: TConstructorIngredient) => s + v.price,
         0
       ),
-    [constructorItems]
+    [safeConstructorItems]
   );
-
-  //return null;
 
   return (
     <BurgerConstructorUI
       price={price}
       orderRequest={orderRequest}
-      constructorItems={constructorItems}
+      constructorItems={safeConstructorItems}
       orderModalData={orderModalData}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}

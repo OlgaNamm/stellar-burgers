@@ -62,8 +62,6 @@ export const BurgerIngredients: FC = () => {
       titleSaucesRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  //return null;
-
   if (isLoading) {
     return <Preloader />;
   }

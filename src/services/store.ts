@@ -8,10 +8,12 @@ import {
 
 import authReducer from './slices/authSlice';
 import ingredientsReducer from './slices/ingredientsSlice';
+import burgerConstructorReducer from './slices/burgerConstructorSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  ingredients: ingredientsReducer
+  ingredients: ingredientsReducer,
+  burgerConstructor: burgerConstructorReducer
   // order: orderReducer
   // feed: feedReducer и тд
 });
