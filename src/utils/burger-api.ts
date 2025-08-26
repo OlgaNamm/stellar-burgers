@@ -45,11 +45,16 @@ export const fetchWithRefresh = async <T>(
   } catch (err) {
     if ((err as { message: string }).message === 'jwt expired') {
       const refreshData = await refreshToken();
-      if (options.headers) {
-        (options.headers as { [key: string]: string }).authorization =
-          refreshData.accessToken;
-      }
-      const res = await fetch(url, options);
+
+      const newOptions = {
+        ...options,
+        headers: {
+          ...options.headers,
+          authorization: `Bearer ${getCookie('accessToken')}`
+        }
+      };
+
+      const res = await fetch(url, newOptions);
       return await checkResponse<T>(res);
     } else {
       return Promise.reject(err);
@@ -208,6 +213,7 @@ type TUserResponse = TServerResponse<{ user: TUser }>;
 
 export const getUserApi = () =>
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
+    method: 'GET',
     headers: {
       authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
