@@ -6,11 +6,15 @@ import { BurgerIngredientsUI } from '../ui/burger-ingredients';
 import { useSelector } from 'react-redux';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 import { useDispatch, RootState } from '../../services/store';
+import { Preloader } from '../ui/preloader';
 
 export const BurgerIngredients: FC = () => {
   const dispatch = useDispatch();
   const ingredients: TIngredient[] = useSelector(
     (state: RootState) => state.ingredients.ingredients
+  );
+  const isLoading = useSelector(
+    (state: RootState) => state.ingredients.isLoading
   );
 
   const buns = ingredients.filter((ing: TIngredient) => ing.type === 'bun');
@@ -59,6 +63,10 @@ export const BurgerIngredients: FC = () => {
   };
 
   //return null;
+
+  if (isLoading) {
+    return <Preloader />;
+  }
 
   return (
     <BurgerIngredientsUI
