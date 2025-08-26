@@ -9,6 +9,11 @@
   margin: 0 auto;
 }
 
+/* Убираем стандартные стили для всех ссылок в меню */
+.menu a {
+  text-decoration: none;
+}
+
 .menu_part_left {
   display: flex;
   flex-basis: 35%;

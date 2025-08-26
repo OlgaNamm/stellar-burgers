@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from '../../services/store';
+import { checkUserAuth } from '../../services/slices/authSlice';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { ConstructorPage } from '@pages';
 import {
@@ -17,6 +19,7 @@ import '../../index.css';
 import styles from './app.module.css';
 
 const App = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const background = location.state && location.state.background;
@@ -24,6 +27,10 @@ const App = () => {
   const handleModalClose = () => {
     navigate(-1);
   };
+
+  useEffect(() => {
+    dispatch(checkUserAuth());
+  }, [dispatch]);
 
   return (
     <div className={styles.app}>
