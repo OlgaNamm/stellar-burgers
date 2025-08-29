@@ -31,8 +31,15 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
         return Promise.reject(refreshData);
       }
       localStorage.setItem('refreshToken', refreshData.refreshToken);
-      setCookie('accessToken', refreshData.accessToken);
-      return refreshData;
+
+      //
+      const cleanToken = refreshData.accessToken.replace(/^Bearer\s+/i, '');
+      setCookie('accessToken', cleanToken);
+
+      return {
+        ...refreshData,
+        accessToken: cleanToken
+      };
     });
 
 export const fetchWithRefresh = async <T>(
@@ -46,12 +53,13 @@ export const fetchWithRefresh = async <T>(
     if ((err as { message: string }).message === 'jwt expired') {
       const refreshData = await refreshToken();
 
+      // СОЗДАЕМ ЗАГОЛОВКИ ЗАНОВО
+      const newHeaders = new Headers(options.headers);
+      newHeaders.set('authorization', `Bearer ${refreshData.accessToken}`);
+
       const newOptions = {
         ...options,
-        headers: {
-          ...options.headers,
-          authorization: `Bearer ${getCookie('accessToken')}`
-        }
+        headers: newHeaders
       };
 
       const res = await fetch(url, newOptions);
@@ -97,7 +105,7 @@ export const getOrdersApi = () =>
     method: 'GET',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
+      authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
   }).then((data) => {
     if (data?.success) return data.orders;
@@ -114,7 +122,7 @@ export const orderBurgerApi = (data: string[]) =>
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
+      authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit,
     body: JSON.stringify({
       ingredients: data
@@ -167,19 +175,24 @@ export type TLoginData = {
   password: string;
 };
 
-export const loginUserApi = (data: TLoginData) =>
-  fetch(`${URL}/auth/login`, {
+export const loginUserApi = (data: TLoginData) => {
+  console.log('Login request data:', data); // отладка
+  return fetch(`${URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
     },
     body: JSON.stringify(data)
   })
-    .then((res) => checkResponse<TAuthResponse>(res))
+    .then((res) => {
+      console.log('Login response status:', res.status);
+      return checkResponse<TAuthResponse>(res);
+    })
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
     });
+};
 
 export const forgotPasswordApi = (data: { email: string }) =>
   fetch(`${URL}/password-reset`, {
@@ -217,6 +230,9 @@ export const getUserApi = () =>
     headers: {
       authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
+  }).then((data) => {
+    if (data?.success) return data;
+    return Promise.reject(data);
   });
 
 export const updateUserApi = (user: Partial<TRegisterData>) =>
@@ -226,7 +242,11 @@ export const updateUserApi = (user: Partial<TRegisterData>) =>
       'Content-Type': 'application/json;charset=utf-8',
       authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit,
-    body: JSON.stringify(user)
+    body: JSON.stringify({
+      name: user.name,
+      email: user.email,
+      password: user.password // Только если меняется пароль
+    })
   });
 
 export const logoutApi = () =>

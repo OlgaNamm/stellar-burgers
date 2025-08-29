@@ -50,8 +50,18 @@ export const loginUser = createAsyncThunk(
   async (data: TLoginData, { rejectWithValue }) => {
     try {
       const response = await loginUserApi(data);
-      setCookie('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
+      console.log('Login response:', response);
+      const cleanAccessToken = response.accessToken.replace(/^Bearer\s+/i, '');
+      const cleanRefreshToken = response.refreshToken;
+
+      setCookie('accessToken', cleanAccessToken);
+      localStorage.setItem('refreshToken', cleanRefreshToken);
+
+      console.log('Tokens saved:', {
+        accessToken: cleanAccessToken,
+        refreshToken: cleanRefreshToken
+      });
+
       return response.user;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Ошибка входа');
@@ -124,7 +134,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // checkUserAuth
+
       .addCase(checkUserAuth.pending, (state) => {
         state.isLoading = true;
       })
@@ -140,7 +150,7 @@ const authSlice = createSlice({
         state.user = null;
         state.error = action.payload as string;
       })
-      // loginUser
+
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -154,7 +164,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      // registerUser
+
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -168,7 +178,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      // logoutUser
+
       .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -181,7 +191,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      // updateUser
+
       .addCase(updateUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
