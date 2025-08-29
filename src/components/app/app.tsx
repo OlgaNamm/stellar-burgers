@@ -29,8 +29,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    console.log('App mounted - checking for global errors');
-    // Проверим localStorage/sessionStorage на наличие старых ошибок
     const storedError =
       localStorage.getItem('authError') || sessionStorage.getItem('authError');
     if (storedError) {
@@ -48,13 +46,11 @@ const App = () => {
     <div className={styles.app}>
       <AppHeader />
       <Routes location={background || location}>
-        {/* Публичные маршруты */}
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
         <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route path='/feed/:number' element={<OrderInfo />} />
 
-        {/* Защищенные маршруты для неавторизованных */}
         <Route
           path='/login'
           element={
@@ -88,7 +84,6 @@ const App = () => {
           }
         />
 
-        {/* Защищенные маршруты для авторизованных */}
         <Route
           path='/profile'
           element={
@@ -114,11 +109,9 @@ const App = () => {
           }
         />
 
-        {/* 404 */}
         <Route path='*' element={<NotFound404 />} />
       </Routes>
 
-      {/* Модальные окна для фоновых маршрутов */}
       {background && (
         <Routes>
           <Route

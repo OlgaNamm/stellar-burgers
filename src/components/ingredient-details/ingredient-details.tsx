@@ -6,7 +6,6 @@ import { IngredientDetailsUI } from '../ui/ingredient-details';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 
 export const IngredientDetails: FC = () => {
-  /** TODO: взять переменную из стора */
   const dispatch = useDispatch();
   const ingredients = useSelector(
     (state: RootState) => state.ingredients.ingredients
@@ -26,7 +25,6 @@ export const IngredientDetails: FC = () => {
     return <Preloader />;
   }
 
-  // Ищем ингредиент по ID из URL параметра
   const ingredientData = ingredients.find(
     (ingredient) => ingredient._id === id
   );

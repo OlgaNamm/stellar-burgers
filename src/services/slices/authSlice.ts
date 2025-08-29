@@ -50,7 +50,6 @@ export const loginUser = createAsyncThunk(
   async (data: TLoginData, { rejectWithValue }) => {
     try {
       const response = await loginUserApi(data);
-      console.log('Login thunk success:', response); // ← ДЛЯ ОТЛАДКИ
 
       const cleanAccessToken = response.accessToken.replace(/^Bearer\s+/i, '');
       setCookie('accessToken', cleanAccessToken);
@@ -58,7 +57,6 @@ export const loginUser = createAsyncThunk(
 
       return response.user;
     } catch (error: any) {
-      console.log('Login thunk error:', error); // ← ДЛЯ ОТЛАДКИ
       return rejectWithValue(error.message || 'Ошибка входа');
     }
   }
@@ -134,14 +132,12 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(checkUserAuth.fulfilled, (state, action) => {
-        console.log('checkUserAuth.fulfilled - user:', action.payload);
         state.isLoading = false;
         state.user = action.payload;
         state.isAuthChecked = true;
         state.error = null;
       })
       .addCase(checkUserAuth.rejected, (state, action) => {
-        console.log('checkUserAuth rejected - error:', action.payload);
         state.isLoading = false;
         state.isAuthChecked = true;
         state.user = null;
@@ -149,18 +145,15 @@ const authSlice = createSlice({
       })
 
       .addCase(loginUser.pending, (state) => {
-        console.log('loginUser.pending - clearing error');
         state.isLoading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log('loginUser.fulfilled - success, clearing error');
         state.isLoading = false;
         state.user = action.payload;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        console.log('loginUser.rejected - setting error:', action.payload);
         state.isLoading = false;
         state.error = action.payload as string;
       })

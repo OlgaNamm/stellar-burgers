@@ -16,8 +16,6 @@ export const burgerConstructorSlice = createSlice({
   initialState,
   reducers: {
     addIngredient: (state, action: PayloadAction<TConstructorIngredient>) => {
-      console.log('NEW SLICE: Adding ingredient', action.payload);
-
       const ingredient = action.payload;
 
       if (ingredient.type === 'bun') {

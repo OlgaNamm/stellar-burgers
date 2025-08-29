@@ -14,7 +14,6 @@ const rootReducer = combineReducers({
   ingredients: ingredientsReducer,
   burgerConstructor: burgerConstructorReducer,
   orders: ordersReducer
-  // feed: feedReducer и тд
 });
 
 const store = configureStore({

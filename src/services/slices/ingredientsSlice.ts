@@ -17,9 +17,6 @@ export const initialState: IngredientsState = {
 export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchIngredients',
   async () => {
-    // задержка для теста
-    //await new Promise((resolve) => setTimeout(resolve, 2000));
-
     const ingredients = await getIngredientsApi();
     return ingredients;
   }

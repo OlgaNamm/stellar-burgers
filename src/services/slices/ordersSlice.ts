@@ -4,9 +4,9 @@ import { getOrdersApi, getFeedsApi } from '../../utils/burger-api';
 
 export interface OrdersState {
   userOrders: TOrder[];
-  currentOrder: TOrder | null; // Добавляем поле для текущего заказа
+  currentOrder: TOrder | null;
   feed: {
-    orders: TOrder[]; // Добавляем массив заказов в фид
+    orders: TOrder[];
     total: number;
     totalToday: number;
   };
@@ -16,9 +16,9 @@ export interface OrdersState {
 
 const initialState: OrdersState = {
   userOrders: [],
-  currentOrder: null, // Инициализируем
+  currentOrder: null,
   feed: {
-    orders: [], // Инициализируем
+    orders: [],
     total: 0,
     totalToday: 0
   },

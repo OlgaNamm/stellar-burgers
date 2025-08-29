@@ -42,7 +42,7 @@ export const BurgerConstructor: FC = () => {
       ];
 
       const orderData = await orderBurgerApi(ingredientIds);
-      setOrderModalData(orderData.order); // ← ИЗМЕНИТЬ ЗДЕСЬ!
+      setOrderModalData(orderData.order);
 
       dispatch(clearConstructor());
     } catch (error) {

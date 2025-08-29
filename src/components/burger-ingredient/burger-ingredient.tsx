@@ -23,7 +23,6 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
     const handleAdd = useCallback(() => {
       try {
         const constructorIngredient = prepareIngredient(ingredient);
-        console.log('Adding ingredient:', constructorIngredient);
         dispatch(addIngredient(constructorIngredient));
       } catch (error) {
         console.error('Error adding ingredient:', error);

@@ -1,9 +1,5 @@
 import { FC, SyntheticEvent } from 'react';
-import {
-  Input,
-  Button,
-  PasswordInput
-} from '@zlden/react-developer-burger-ui-components';
+import { Input, Button } from '@zlden/react-developer-burger-ui-components';
 import styles from '../common.module.css';
 import { Link } from 'react-router-dom';
 import { LoginUIProps } from './type';
@@ -17,8 +13,8 @@ export const LoginUI: FC<LoginUIProps> = ({
   setPassword,
   isLoading = false
 }) => {
-  console.log('LoginUI rendering with errorText:', errorText);
-  console.log('LoginUI props:', { email, password, isLoading });
+  const isPasswordError = errorText === 'Некорректный пароль';
+  const isServerError = errorText && errorText !== 'Некорректный пароль';
 
   return (
     <main className={styles.container}>
@@ -37,20 +33,26 @@ export const LoginUI: FC<LoginUIProps> = ({
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
                 name='email'
-                error={!!errorText}
-                errorText={errorText}
+                error={false}
+                errorText=''
                 size='default'
                 disabled={isLoading}
+                autoComplete='email'
               />
             </div>
             <div className='pb-6'>
-              <PasswordInput
+              <Input
+                type='password'
+                placeholder='Пароль'
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
                 name='password'
-                // У PasswordInput могут быть другие пропсы для ошибок
-                // Проверим документацию или уберем error пропсы
+                error={isPasswordError} // Показываем ошибку у поля
+                errorText={isPasswordError ? errorText : ''} // Текст ошибки у поля
+                size='default'
                 disabled={isLoading}
+                autoComplete='current-password'
+                icon={'HideIcon'}
               />
             </div>
             <div className={`pb-6 ${styles.button}`}>
@@ -63,24 +65,10 @@ export const LoginUI: FC<LoginUIProps> = ({
                 {isLoading ? 'Вход...' : 'Войти'}
               </Button>
             </div>
-            {errorText && (
-              <div>
-                <p
-                  className={`${styles.error} text text_type_main-default pb-6`}
-                >
-                  Ошибка: {errorText}
-                </p>
-                <p
-                  className={`text text_type_main-default pb-6`}
-                  style={{ fontSize: '12px', color: '#8585ad' }}
-                >
-                  (Источник:{' '}
-                  {errorText.includes('Некорректный пароль')
-                    ? 'возможно UI библиотека'
-                    : 'Redux'}
-                  )
-                </p>
-              </div>
+            {isServerError && !isLoading && (
+              <p className={`${styles.error} text text_type_main-default pb-6`}>
+                {errorText}
+              </p>
             )}
           </>
         </form>
