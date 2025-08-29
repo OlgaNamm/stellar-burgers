@@ -12,10 +12,15 @@ export const Profile: FC = () => {
   const [formValue, setFormValue] = useState({
     name: user?.name || '',
     email: user?.email || '',
+    password: '' // Пароль только для смены пароля (но это отдельный функционал)
+  });
+
+  const [initialFormValue, setInitialFormValue] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
     password: ''
   });
 
-  const [initialFormValue, setInitialFormValue] = useState(formValue);
   const [showButtons, setShowButtons] = useState(false);
 
   useEffect(() => {
@@ -28,17 +33,16 @@ export const Profile: FC = () => {
 
     setInitialFormValue(newInitialValues);
     setFormValue(newInitialValues);
-    setShowButtons(false); // Скрываем кнопки при загрузке
+    setShowButtons(false);
   }, [user]);
 
-  // Проверяем изменения относительно начальных значений
+  // Проверяем изменения только для имени и email
   useEffect(() => {
-    const isChanged =
-      formValue.name !== initialFormValue.name ||
-      formValue.email !== initialFormValue.email ||
-      formValue.password !== initialFormValue.password;
+    const isNameChanged = formValue.name !== initialFormValue.name;
+    const isEmailChanged = formValue.email !== initialFormValue.email;
 
-    setShowButtons(isChanged);
+    // Пароль не учитываем в сравнении, так как его нельзя обновить через этот endpoint
+    setShowButtons(isNameChanged || isEmailChanged);
   }, [formValue, initialFormValue]);
 
   const handleSubmit = async (e: SyntheticEvent) => {
@@ -46,17 +50,28 @@ export const Profile: FC = () => {
     setUpdateError('');
 
     try {
-      await dispatch(updateUser(formValue)).unwrap();
+      // Обновляем только имя и email (пароль через этот endpoint не обновляется)
+      const updateData: Partial<TUser> = {};
+
+      if (formValue.name !== initialFormValue.name) {
+        updateData.name = formValue.name;
+      }
+
+      if (formValue.email !== initialFormValue.email) {
+        updateData.email = formValue.email;
+      }
+
+      await dispatch(updateUser(updateData)).unwrap();
 
       // Обновляем начальные значения после успешного сохранения
       setInitialFormValue({
         name: formValue.name,
         email: formValue.email,
-        password: '' // Пароль не сохраняем в initial
+        password: '' // Пароль очищаем
       });
 
       setFormValue((prev) => ({ ...prev, password: '' })); // Очищаем пароль
-      setShowButtons(false); // Скрываем кнопки после сохранения
+      setShowButtons(false);
     } catch (error: any) {
       setUpdateError(error.message || 'Ошибка обновления данных');
     }
@@ -65,9 +80,13 @@ export const Profile: FC = () => {
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
     // Возвращаем начальные значения
-    setFormValue(initialFormValue);
+    setFormValue({
+      name: initialFormValue.name,
+      email: initialFormValue.email,
+      password: '' // Пароль всегда очищаем
+    });
     setUpdateError('');
-    setShowButtons(false); // Скрываем кнопки после отмены
+    setShowButtons(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

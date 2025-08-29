@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent, useState, useEffect } from 'react';
+import { FC, SyntheticEvent, useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { useNavigate } from 'react-router-dom';
 import { LoginUI } from '@ui-pages';
@@ -9,39 +9,69 @@ export const Login: FC = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const errorClearedRef = useRef(false); // ← Флаг для отслеживания очистки
 
   const { error, user, isLoading } = useSelector((state) => state.auth);
+  const [displayError, setDisplayError] = useState('');
 
   useEffect(() => {
-    console.log('Current error state:', error);
-  }, [error]);
+    console.log('=== LOGIN COMPONENT ===');
+    console.log('Redux error:', error);
+    console.log('Display error:', displayError);
+    console.log('User:', user);
+  }, [error, displayError, user]);
 
-  // Очищаем ошибку при монтировании компонента
   useEffect(() => {
+    console.log('Clearing error on mount');
     dispatch(clearError());
+    errorClearedRef.current = true;
   }, [dispatch]);
 
-  // Навигация после успешного входа
   useEffect(() => {
-    if (user) {
+    if (error) {
+      setDisplayError(error);
+      errorClearedRef.current = false;
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (user && displayError) {
+      console.log(
+        'User authenticated but error still displayed, forcing clear'
+      );
+      setDisplayError('');
+      dispatch(clearError());
+      errorClearedRef.current = true;
+
+      // Небольшая задержка для уверенности
+      setTimeout(() => {
+        navigate('/');
+      }, 50);
+    } else if (user) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, displayError, navigate, dispatch]);
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(clearError()); // ← Очищаем перед каждым запросом
+
+    if (!email || !password) {
+      return;
+    }
+
+    console.log('Dispatching loginUser');
     dispatch(loginUser({ email, password }));
   };
 
   return (
     <LoginUI
-      errorText={error || ''}
+      errorText={''} // ← Временно пустая строка
       email={email}
       setEmail={setEmail}
       password={password}
       setPassword={setPassword}
       handleSubmit={handleSubmit}
+      isLoading={isLoading}
     />
   );
 };

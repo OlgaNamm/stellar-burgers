@@ -29,6 +29,18 @@ const App = () => {
   };
 
   useEffect(() => {
+    console.log('App mounted - checking for global errors');
+    // Проверим localStorage/sessionStorage на наличие старых ошибок
+    const storedError =
+      localStorage.getItem('authError') || sessionStorage.getItem('authError');
+    if (storedError) {
+      console.log('Found stored error:', storedError);
+      localStorage.removeItem('authError');
+      sessionStorage.removeItem('authError');
+    }
+  }, []);
+
+  useEffect(() => {
     dispatch(checkUserAuth());
   }, [dispatch]);
 

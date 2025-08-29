@@ -149,15 +149,18 @@ const authSlice = createSlice({
       })
 
       .addCase(loginUser.pending, (state) => {
+        console.log('loginUser.pending - clearing error');
         state.isLoading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log('loginUser.fulfilled - success, clearing error');
         state.isLoading = false;
         state.user = action.payload;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        console.log('loginUser.rejected - setting error:', action.payload);
         state.isLoading = false;
         state.error = action.payload as string;
       })
