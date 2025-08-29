@@ -1,37 +1,60 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from '../../services/store';
+import { useDispatch, useSelector } from '../../services/store';
 import {
   selectConstructorBun,
   selectConstructorIngredients
 } from '../../services/selectors/constructorSelectors';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
+import { orderBurgerApi } from '../../utils/burger-api';
+import { clearConstructor } from '../../services/slices/burgerConstructorSlice';
 
 export const BurgerConstructor: FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const bun = useSelector(selectConstructorBun);
   const ingredients = useSelector(selectConstructorIngredients);
+
+  const [orderRequest, setOrderRequest] = useState(false);
+  const [orderModalData, setOrderModalData] = useState<any>(null);
 
   const safeConstructorItems = {
     bun: bun || null,
     ingredients: ingredients || []
   };
 
-  const orderRequest = false;
-  const orderModalData = null;
-
-  const onOrderClick = () => {
+  const onOrderClick = async () => {
     if (!user) {
       navigate('/login');
       return;
     }
     if (!safeConstructorItems.bun || orderRequest) return;
-    // TODO: логика оформления заказа
+
+    try {
+      setOrderRequest(true);
+
+      const ingredientIds = [
+        safeConstructorItems.bun._id,
+        ...safeConstructorItems.ingredients.map((i) => i._id),
+        safeConstructorItems.bun._id
+      ];
+
+      const orderData = await orderBurgerApi(ingredientIds);
+      setOrderModalData(orderData.order); // ← ИЗМЕНИТЬ ЗДЕСЬ!
+
+      dispatch(clearConstructor());
+    } catch (error) {
+      console.error('Ошибка оформления заказа:', error);
+    } finally {
+      setOrderRequest(false);
+    }
   };
 
-  const closeOrderModal = () => {};
+  const closeOrderModal = () => {
+    setOrderModalData(null);
+  };
 
   const price = useMemo(
     () =>

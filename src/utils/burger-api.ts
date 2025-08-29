@@ -128,6 +128,7 @@ export const orderBurgerApi = (data: string[]) =>
       ingredients: data
     })
   }).then((data) => {
+    console.log('Order response:', data); // ДЛЯ ОТЛАДКИ
     if (data?.success) return data;
     return Promise.reject(data);
   });
@@ -175,9 +176,8 @@ export type TLoginData = {
   password: string;
 };
 
-export const loginUserApi = (data: TLoginData) => {
-  console.log('Login request data:', data); // отладка
-  return fetch(`${URL}/auth/login`, {
+export const loginUserApi = (data: TLoginData) =>
+  fetch(`${URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -185,14 +185,20 @@ export const loginUserApi = (data: TLoginData) => {
     body: JSON.stringify(data)
   })
     .then((res) => {
-      console.log('Login response status:', res.status);
+      console.log('Login API response status:', res.status); // ← ДЛЯ ОТЛАДКИ
+      if (!res.ok) {
+        return res.json().then((err) => {
+          console.log('Login API error:', err); // ← ДЛЯ ОТЛАДКИ
+          return Promise.reject(err);
+        });
+      }
       return checkResponse<TAuthResponse>(res);
     })
     .then((data) => {
+      console.log('Login API success:', data); // ← ДЛЯ ОТЛАДКИ
       if (data?.success) return data;
       return Promise.reject(data);
     });
-};
 
 export const forgotPasswordApi = (data: { email: string }) =>
   fetch(`${URL}/password-reset`, {

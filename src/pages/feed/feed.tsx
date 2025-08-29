@@ -1,15 +1,27 @@
 import { Preloader } from '@ui';
 import { FeedUI } from '@ui-pages';
 import { TOrder } from '@utils-types';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
+import { useDispatch, useSelector } from '../../services/store';
+import { fetchFeed } from '../../services/slices/ordersSlice'; // Импортируем правильный экшен
 
 export const Feed: FC = () => {
-  /** TODO: взять переменную из стора */
-  const orders: TOrder[] = [];
+  const dispatch = useDispatch();
+  // Получаем все заказы из фида, а не только пользовательские
+  const orders: TOrder[] = useSelector(
+    (state) => state.orders.feed.orders || []
+  );
+  const isLoading = useSelector((state) => state.orders.isLoading);
 
-  if (!orders.length) {
+  useEffect(() => {
+    dispatch(fetchFeed()); // Используем экшен из слайса
+  }, [dispatch]);
+
+  if (isLoading || !orders.length) {
     return <Preloader />;
   }
 
-  <FeedUI orders={orders} handleGetFeeds={() => {}} />;
+  return (
+    <FeedUI orders={orders} handleGetFeeds={() => dispatch(fetchFeed())} />
+  );
 };

@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, SyntheticEvent, useState, useEffect } from 'react';
 import {
   Input,
   Button,

@@ -1,31 +1,42 @@
-import { FC, SyntheticEvent, useState } from 'react';
-import { useDispatch } from '../../services/store';
+import { FC, SyntheticEvent, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from '../../services/store';
 import { useNavigate } from 'react-router-dom';
 import { LoginUI } from '@ui-pages';
-import { loginUser } from '../../services/slices/authSlice';
+import { loginUser, clearError } from '../../services/slices/authSlice';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
-    setError('');
+  const { error, user, isLoading } = useSelector((state) => state.auth);
 
-    try {
-      await dispatch(loginUser({ email, password })).unwrap();
+  useEffect(() => {
+    console.log('Current error state:', error);
+  }, [error]);
+
+  // Очищаем ошибку при монтировании компонента
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Навигация после успешного входа
+  useEffect(() => {
+    if (user) {
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Ошибка входа');
     }
+  }, [user, navigate]);
+
+  const handleSubmit = (e: SyntheticEvent) => {
+    e.preventDefault();
+    dispatch(clearError()); // ← Очищаем перед каждым запросом
+    dispatch(loginUser({ email, password }));
   };
 
   return (
     <LoginUI
-      errorText={error}
+      errorText={error || ''}
       email={email}
       setEmail={setEmail}
       password={password}

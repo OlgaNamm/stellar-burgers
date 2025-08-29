@@ -15,43 +15,59 @@ export const Profile: FC = () => {
     password: ''
   });
 
+  const [initialFormValue, setInitialFormValue] = useState(formValue);
+  const [showButtons, setShowButtons] = useState(false);
+
   useEffect(() => {
-    setFormValue((prevState) => ({
-      ...prevState,
+    // Устанавливаем начальные значения при загрузке пользователя
+    const newInitialValues = {
       name: user?.name || '',
-      email: user?.email || ''
-    }));
+      email: user?.email || '',
+      password: ''
+    };
+
+    setInitialFormValue(newInitialValues);
+    setFormValue(newInitialValues);
+    setShowButtons(false); // Скрываем кнопки при загрузке
   }, [user]);
 
-  const isFormChanged =
-    formValue.name !== user?.name ||
-    formValue.email !== user?.email ||
-    !!formValue.password;
+  // Проверяем изменения относительно начальных значений
+  useEffect(() => {
+    const isChanged =
+      formValue.name !== initialFormValue.name ||
+      formValue.email !== initialFormValue.email ||
+      formValue.password !== initialFormValue.password;
+
+    setShowButtons(isChanged);
+  }, [formValue, initialFormValue]);
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
     setUpdateError('');
 
-    console.log('Updating user with data:', formValue);
-
     try {
       await dispatch(updateUser(formValue)).unwrap();
-      setFormValue((prev) => ({ ...prev, password: '' })); // Очистить пароль после успеха
-      console.log('User updated successfully');
+
+      // Обновляем начальные значения после успешного сохранения
+      setInitialFormValue({
+        name: formValue.name,
+        email: formValue.email,
+        password: '' // Пароль не сохраняем в initial
+      });
+
+      setFormValue((prev) => ({ ...prev, password: '' })); // Очищаем пароль
+      setShowButtons(false); // Скрываем кнопки после сохранения
     } catch (error: any) {
-      console.error('Update error:', error);
       setUpdateError(error.message || 'Ошибка обновления данных');
     }
   };
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
-    setFormValue({
-      name: user?.name || '',
-      email: user?.email || '',
-      password: ''
-    });
+    // Возвращаем начальные значения
+    setFormValue(initialFormValue);
     setUpdateError('');
+    setShowButtons(false); // Скрываем кнопки после отмены
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,10 +80,11 @@ export const Profile: FC = () => {
   return (
     <ProfileUI
       formValue={formValue}
-      isFormChanged={isFormChanged}
+      isFormChanged={showButtons}
       handleCancel={handleCancel}
       handleSubmit={handleSubmit}
       handleInputChange={handleInputChange}
+      updateUserError={updateError}
     />
   );
 };

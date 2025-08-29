@@ -1,23 +1,44 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo, useRef } from 'react';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
+import { useDispatch, useSelector } from '../../services/store';
+import { useLocation, useParams } from 'react-router-dom';
+import { fetchFeed, fetchUserOrders } from '../../services/slices/ordersSlice';
+import {
+  selectOrderByNumber,
+  selectIngredients
+} from '../../services/selectors/ordersSelectors';
 
 export const OrderInfo: FC = () => {
-  /** TODO: взять переменные orderData и ingredients из стора */
-  const orderData = {
-    createdAt: '',
-    ingredients: [],
-    _id: '',
-    status: '',
-    name: '',
-    updatedAt: 'string',
-    number: 0
-  };
+  const { number } = useParams();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
-  const ingredients: TIngredient[] = [];
+  const initRef = useRef<boolean>(true);
 
-  /* Готовим данные для отображения */
+  const ingredients = useSelector(selectIngredients);
+  const orderNumber = number ? parseInt(number) : null;
+  const orderData = useSelector(selectOrderByNumber(orderNumber!));
+
+  useEffect(() => {
+    if (!initRef.current) return;
+
+    // Если заказ не найден, загружаем соответствующие данные
+    if (!orderData && orderNumber) {
+      const isProfilePage = location.pathname.includes('profile');
+      if (isProfilePage) {
+        dispatch(fetchUserOrders());
+      } else {
+        dispatch(fetchFeed());
+      }
+    }
+
+    return () => {
+      initRef.current = false;
+    };
+  }, [orderData, orderNumber, dispatch, location.pathname]);
+
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
@@ -63,5 +84,12 @@ export const OrderInfo: FC = () => {
     return <Preloader />;
   }
 
-  return <OrderInfoUI orderInfo={orderInfo} />;
+  return (
+    <>
+      {!location.state && (
+        <span className='text text_type_main-large'>{`#${orderInfo.number}`}</span>
+      )}
+      <OrderInfoUI orderInfo={orderInfo} />
+    </>
+  );
 };

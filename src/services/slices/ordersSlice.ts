@@ -1,15 +1,27 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
-import { getOrdersApi } from '../../utils/burger-api';
+import { getOrdersApi, getFeedsApi } from '../../utils/burger-api';
 
 export interface OrdersState {
   userOrders: TOrder[];
+  currentOrder: TOrder | null; // Добавляем поле для текущего заказа
+  feed: {
+    orders: TOrder[]; // Добавляем массив заказов в фид
+    total: number;
+    totalToday: number;
+  };
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: OrdersState = {
   userOrders: [],
+  currentOrder: null, // Инициализируем
+  feed: {
+    orders: [], // Инициализируем
+    total: 0,
+    totalToday: 0
+  },
   isLoading: false,
   error: null
 };
@@ -26,6 +38,18 @@ export const fetchUserOrders = createAsyncThunk(
   }
 );
 
+export const fetchFeed = createAsyncThunk(
+  'orders/fetchFeed',
+  async (_, { rejectWithValue }) => {
+    try {
+      const feedData = await getFeedsApi();
+      return feedData;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка загрузки фида');
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
@@ -33,6 +57,12 @@ const ordersSlice = createSlice({
     clearOrders: (state) => {
       state.userOrders = [];
       state.error = null;
+    },
+    setCurrentOrder: (state, action: PayloadAction<TOrder>) => {
+      state.currentOrder = action.payload;
+    },
+    clearCurrentOrder: (state) => {
+      state.currentOrder = null;
     }
   },
   extraReducers: (builder) => {
@@ -49,9 +79,22 @@ const ordersSlice = createSlice({
       .addCase(fetchUserOrders.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+      .addCase(fetchFeed.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchFeed.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.feed = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchFeed.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       });
   }
 });
 
-export const { clearOrders } = ordersSlice.actions;
+export const { clearOrders, setCurrentOrder, clearCurrentOrder } =
+  ordersSlice.actions;
 export default ordersSlice.reducer;
