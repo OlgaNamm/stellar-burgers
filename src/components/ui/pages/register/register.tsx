@@ -1,6 +1,6 @@
-import { FC, useState } from 'react';
+import { FC, ChangeEvent } from 'react';
+import { Input } from '../../my-input';
 import {
-  Input,
   Button,
   PasswordInput
 } from '@zlden/react-developer-burger-ui-components';
@@ -31,7 +31,9 @@ export const RegisterUI: FC<RegisterUIProps> = ({
             <Input
               type='text'
               placeholder='Имя'
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setUserName(e.target.value)
+              }
               value={userName}
               name='name'
               error={false}
@@ -43,7 +45,9 @@ export const RegisterUI: FC<RegisterUIProps> = ({
             <Input
               type='email'
               placeholder='E-mail'
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
               value={email}
               name={'email'}
               error={false}

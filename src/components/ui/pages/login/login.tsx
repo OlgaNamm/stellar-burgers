@@ -1,5 +1,6 @@
-import { FC, SyntheticEvent } from 'react';
-import { Input, Button } from '@zlden/react-developer-burger-ui-components';
+import { FC, ChangeEvent } from 'react';
+import { Input } from '../../my-input';
+import { Button } from '@zlden/react-developer-burger-ui-components';
 import styles from '../common.module.css';
 import { Link } from 'react-router-dom';
 import { LoginUIProps } from './type';
@@ -30,7 +31,9 @@ export const LoginUI: FC<LoginUIProps> = ({
               <Input
                 type='email'
                 placeholder='E-mail'
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
                 value={email}
                 name='email'
                 error={false}
@@ -44,7 +47,9 @@ export const LoginUI: FC<LoginUIProps> = ({
               <Input
                 type='password'
                 placeholder='Пароль'
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
                 value={password}
                 name='password'
                 error={isPasswordError} // Показываем ошибку у поля
