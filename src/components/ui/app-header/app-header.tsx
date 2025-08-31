@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
 import styles from './app-header.module.css';
 import { TAppHeaderUIProps } from './type';
 import {
@@ -9,66 +8,88 @@ import {
   ProfileIcon
 } from '@zlden/react-developer-burger-ui-components';
 
-export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => {
-  const location = useLocation();
-
-  const isActive = (path: string, isProfile: boolean = false) => {
-    if (isProfile) {
-      return location.pathname.startsWith('/profile');
+export const AppHeaderUI: FC<TAppHeaderUIProps> = ({
+  userName,
+  constructorLink,
+  feedLink,
+  profileLink,
+  logoLink
+}) => {
+  // Значения по умолчанию для обратной совместимости
+  const defaultLink = {
+    to: '#',
+    isActive: false,
+    onClick: (e: React.MouseEvent) => {
+      e.preventDefault();
+      console.log(
+        'Link clicked - implement navigation logic in parent component'
+      );
     }
-    return location.pathname === path;
   };
 
-  const linkClass = (isActive: boolean) =>
-    `${styles.menu_link} text text_type_main-default ml-2 ${isActive ? styles.active : ''}`;
+  const links = {
+    constructor: constructorLink || defaultLink,
+    feed: feedLink || defaultLink,
+    profile: profileLink || defaultLink,
+    logo: logoLink || defaultLink
+  };
 
   return (
     <header className={styles.header}>
       <nav className={`${styles.menu} p-4`}>
         <div className={styles.menu_part_left}>
-          <NavLink
-            to='/'
-            className={({ isActive }) =>
-              `${styles.link} ${isActive ? styles.link_active : ''}`
-            }
+          {/* Конструктор */}
+          <a
+            href={links.constructor.to}
+            className={`${styles.link} ${links.constructor.isActive ? styles.link_active : ''}`}
+            onClick={links.constructor.onClick}
           >
-            <BurgerIcon type={'primary'} />
+            <BurgerIcon
+              type={links.constructor.isActive ? 'primary' : 'secondary'}
+            />
             <span className='text text_type_main-default ml-2 mr-10'>
               Конструктор
             </span>
-          </NavLink>
+          </a>
 
-          <NavLink
-            to='/feed'
-            className={({ isActive }) =>
-              `${styles.link} ${isActive ? styles.link_active : ''}`
-            }
+          {/* Лента заказов */}
+          <a
+            href={links.feed.to}
+            className={`${styles.link} ${links.feed.isActive ? styles.link_active : ''}`}
+            onClick={links.feed.onClick}
           >
-            <ListIcon type={'primary'} />
+            <ListIcon type={links.feed.isActive ? 'primary' : 'secondary'} />
             <span className='text text_type_main-default ml-2'>
               Лента заказов
             </span>
-          </NavLink>
+          </a>
         </div>
 
+        {/* Логотип */}
         <div className={styles.logo}>
-          <NavLink to='/' className={styles.link}>
+          <a
+            href={links.logo.to}
+            className={styles.link}
+            onClick={links.logo.onClick}
+          >
             <Logo className='' />
-          </NavLink>
+          </a>
         </div>
 
+        {/* Личный кабинет */}
         <div className={styles.link_position_last}>
-          <NavLink
-            to='/profile'
-            className={({ isActive }) =>
-              `${styles.link} ${isActive ? styles.link_active : ''}`
-            }
+          <a
+            href={links.profile.to}
+            className={`${styles.link} ${links.profile.isActive ? styles.link_active : ''}`}
+            onClick={links.profile.onClick}
           >
-            <ProfileIcon type={'primary'} />
+            <ProfileIcon
+              type={links.profile.isActive ? 'primary' : 'secondary'}
+            />
             <span className='text text_type_main-default ml-2'>
               {userName || 'Личный кабинет'}
             </span>
-          </NavLink>
+          </a>
         </div>
       </nav>
     </header>

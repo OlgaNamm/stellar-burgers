@@ -94,10 +94,18 @@ export const getIngredientsApi = () =>
 
 export const getFeedsApi = () =>
   fetch(`${URL}/orders/all`)
-    .then((res) => checkResponse<TFeedsResponse>(res))
+    .then((res) => {
+      console.log('Feed API response status:', res.status);
+      return checkResponse<TFeedsResponse>(res);
+    })
     .then((data) => {
+      console.log('Feed API data received:', data);
       if (data?.success) return data;
       return Promise.reject(data);
+    })
+    .catch((error) => {
+      console.error('Feed API error:', error);
+      throw error;
     });
 
 export const getOrdersApi = () =>
@@ -128,7 +136,6 @@ export const orderBurgerApi = (data: string[]) =>
       ingredients: data
     })
   }).then((data) => {
-    console.log('Order response:', data); // ДЛЯ ОТЛАДКИ
     if (data?.success) return data;
     return Promise.reject(data);
   });
@@ -185,17 +192,12 @@ export const loginUserApi = (data: TLoginData) =>
     body: JSON.stringify(data)
   })
     .then((res) => {
-      console.log('Login API response status:', res.status); // ← ДЛЯ ОТЛАДКИ
       if (!res.ok) {
-        return res.json().then((err) => {
-          console.log('Login API error:', err); // ← ДЛЯ ОТЛАДКИ
-          return Promise.reject(err);
-        });
+        return res.json().then((err) => Promise.reject(err));
       }
       return checkResponse<TAuthResponse>(res);
     })
     .then((data) => {
-      console.log('Login API success:', data); // ← ДЛЯ ОТЛАДКИ
       if (data?.success) return data;
       return Promise.reject(data);
     });
@@ -236,10 +238,7 @@ export const getUserApi = () =>
     headers: {
       authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
-  }).then((data) => {
-    if (data?.success) return data;
-    return Promise.reject(data);
-  });
+  }).then((data) => (data?.success ? data : Promise.reject(data)));
 
 export const updateUserApi = (user: Partial<TRegisterData>) =>
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
@@ -251,9 +250,9 @@ export const updateUserApi = (user: Partial<TRegisterData>) =>
     body: JSON.stringify({
       name: user.name,
       email: user.email,
-      password: user.password // Только если меняется пароль
+      password: user.password
     })
-  });
+  }).then((data) => (data?.success ? data : Promise.reject(data)));
 
 export const logoutApi = () =>
   fetch(`${URL}/auth/logout`, {

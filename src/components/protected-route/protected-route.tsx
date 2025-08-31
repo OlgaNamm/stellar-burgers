@@ -2,6 +2,11 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/store';
+import { Preloader } from '../ui/preloader/preloader';
+import {
+  selectUser,
+  selectIsAuthChecked
+} from '../../services/selectors/authSelectors';
 
 interface ProtectedRouteProps {
   onlyUnauth?: boolean;
@@ -12,11 +17,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   onlyUnauth = false,
   children
 }) => {
-  const { user, isAuthChecked } = useSelector((state: RootState) => state.auth);
+  const user = useSelector(selectUser);
+  const isAuthChecked = useSelector(selectIsAuthChecked);
   const location = useLocation();
 
   if (!isAuthChecked) {
-    return <div>Проверка авторизации...</div>;
+    return <Preloader />;
   }
 
   // если авторизован

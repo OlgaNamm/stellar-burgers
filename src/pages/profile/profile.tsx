@@ -3,10 +3,11 @@ import { FC, SyntheticEvent, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from '../../services/store';
 import { updateUser } from '../../services/slices/authSlice';
 import { TUser } from '@utils-types';
+import { selectUser } from '../../services/selectors/authSelectors';
 
 export const Profile: FC = () => {
   const dispatch = useDispatch();
-  const user: TUser | null = useSelector((state) => state.auth.user);
+  const user: TUser | null = useSelector(selectUser);
   const [updateError, setUpdateError] = useState('');
 
   const [formValue, setFormValue] = useState({

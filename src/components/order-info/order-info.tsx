@@ -30,7 +30,7 @@ export const OrderInfo: FC = () => {
       if (isProfilePage) {
         dispatch(fetchUserOrders());
       } else {
-        dispatch(fetchFeed());
+        //dispatch(fetchFeed());
       }
     }
 
