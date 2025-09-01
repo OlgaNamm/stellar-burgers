@@ -41,6 +41,8 @@ export const LoginUI: FC<LoginUIProps> = ({
                 size='default'
                 disabled={isLoading}
                 autoComplete='email'
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
               />
             </div>
             <div className='pb-6'>
@@ -58,6 +60,8 @@ export const LoginUI: FC<LoginUIProps> = ({
                 disabled={isLoading}
                 autoComplete='current-password'
                 icon={'HideIcon'}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
               />
             </div>
             <div className={`pb-6 ${styles.button}`}>

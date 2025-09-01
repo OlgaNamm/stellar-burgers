@@ -13,7 +13,7 @@ export const Profile: FC = () => {
   const [formValue, setFormValue] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    password: '' // Пароль только для смены пароля (но это отдельный функционал)
+    password: ''
   });
 
   const [initialFormValue, setInitialFormValue] = useState({
@@ -25,7 +25,6 @@ export const Profile: FC = () => {
   const [showButtons, setShowButtons] = useState(false);
 
   useEffect(() => {
-    // Устанавливаем начальные значения при загрузке пользователя
     const newInitialValues = {
       name: user?.name || '',
       email: user?.email || '',
@@ -37,12 +36,10 @@ export const Profile: FC = () => {
     setShowButtons(false);
   }, [user]);
 
-  // Проверяем изменения только для имени и email
   useEffect(() => {
     const isNameChanged = formValue.name !== initialFormValue.name;
     const isEmailChanged = formValue.email !== initialFormValue.email;
 
-    // Пароль не учитываем в сравнении, так как его нельзя обновить через этот endpoint
     setShowButtons(isNameChanged || isEmailChanged);
   }, [formValue, initialFormValue]);
 
@@ -51,7 +48,6 @@ export const Profile: FC = () => {
     setUpdateError('');
 
     try {
-      // Обновляем только имя и email (пароль через этот endpoint не обновляется)
       const updateData: Partial<TUser> = {};
 
       if (formValue.name !== initialFormValue.name) {
@@ -64,14 +60,13 @@ export const Profile: FC = () => {
 
       await dispatch(updateUser(updateData)).unwrap();
 
-      // Обновляем начальные значения после успешного сохранения
       setInitialFormValue({
         name: formValue.name,
         email: formValue.email,
-        password: '' // Пароль очищаем
+        password: ''
       });
 
-      setFormValue((prev) => ({ ...prev, password: '' })); // Очищаем пароль
+      setFormValue((prev) => ({ ...prev, password: '' }));
       setShowButtons(false);
     } catch (error: any) {
       setUpdateError(error.message || 'Ошибка обновления данных');
@@ -80,11 +75,10 @@ export const Profile: FC = () => {
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
-    // Возвращаем начальные значения
     setFormValue({
       name: initialFormValue.name,
       email: initialFormValue.email,
-      password: '' // Пароль всегда очищаем
+      password: ''
     });
     setUpdateError('');
     setShowButtons(false);

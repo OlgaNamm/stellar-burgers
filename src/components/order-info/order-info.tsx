@@ -24,13 +24,10 @@ export const OrderInfo: FC = () => {
   useEffect(() => {
     if (!initRef.current) return;
 
-    // Если заказ не найден, загружаем соответствующие данные
     if (!orderData && orderNumber) {
       const isProfilePage = location.pathname.includes('profile');
       if (isProfilePage) {
         dispatch(fetchUserOrders());
-      } else {
-        //dispatch(fetchFeed());
       }
     }
 

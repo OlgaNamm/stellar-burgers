@@ -15,7 +15,6 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({
   profileLink,
   logoLink
 }) => {
-  // Значения по умолчанию для обратной совместимости
   const defaultLink = {
     to: '#',
     isActive: false,
@@ -38,7 +37,6 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({
     <header className={styles.header}>
       <nav className={`${styles.menu} p-4`}>
         <div className={styles.menu_part_left}>
-          {/* Конструктор */}
           <a
             href={links.constructor.to}
             className={`${styles.link} ${links.constructor.isActive ? styles.link_active : ''}`}
@@ -52,7 +50,6 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({
             </span>
           </a>
 
-          {/* Лента заказов */}
           <a
             href={links.feed.to}
             className={`${styles.link} ${links.feed.isActive ? styles.link_active : ''}`}
@@ -65,7 +62,6 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({
           </a>
         </div>
 
-        {/* Логотип */}
         <div className={styles.logo}>
           <a
             href={links.logo.to}
@@ -76,7 +72,6 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({
           </a>
         </div>
 
-        {/* Личный кабинет */}
         <div className={styles.link_position_last}>
           <a
             href={links.profile.to}

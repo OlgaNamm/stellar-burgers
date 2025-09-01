@@ -21,7 +21,6 @@ export const Login: FC = () => {
     setLocalError('');
   }, [dispatch]);
 
-  // Очищаем пароль при размонтировании компонента
   useEffect(
     () => () => {
       setPassword('');
@@ -40,7 +39,7 @@ export const Login: FC = () => {
 
   return (
     <LoginUI
-      errorText={localError || error || ''} // Сначала локальные ошибки, потом серверные
+      errorText={localError || error || ''}
       email={email}
       setEmail={setEmail}
       password={password}
