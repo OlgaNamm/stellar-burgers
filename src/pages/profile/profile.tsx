@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from '../../services/store';
 import { updateUser } from '../../services/slices/authSlice';
 import { TUser } from '@utils-types';
 import { selectUser } from '../../services/selectors/authSelectors';
+import { getErrorMessage } from '../../utils/error-handler';
 
 export const Profile: FC = () => {
   const dispatch = useDispatch();
@@ -68,8 +69,8 @@ export const Profile: FC = () => {
 
       setFormValue((prev) => ({ ...prev, password: '' }));
       setShowButtons(false);
-    } catch (error: any) {
-      setUpdateError(error.message || 'Ошибка обновления данных');
+    } catch (error: unknown) {
+      setUpdateError(getErrorMessage(error, 'Ошибка обновления данных'));
     }
   };
 

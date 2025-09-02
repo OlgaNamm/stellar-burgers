@@ -5,6 +5,7 @@ import {
   getFeedsApi,
   orderBurgerApi
 } from '../../utils/burger-api';
+import { getErrorMessage } from '../../utils/error-handler';
 
 export interface OrdersState {
   userOrders: TOrder[];
@@ -36,8 +37,8 @@ export const fetchUserOrders = createAsyncThunk(
     try {
       const orders = await getOrdersApi();
       return orders;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка загрузки заказов');
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Ошибка загрузки заказов'));
     }
   }
 );
@@ -50,9 +51,9 @@ export const fetchFeed = createAsyncThunk(
       const feedData = await getFeedsApi();
       console.log('Feed data received:', feedData);
       return feedData;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching feed:', error);
-      return rejectWithValue(error.message || 'Ошибка загрузки фида');
+      return rejectWithValue(getErrorMessage(error, 'Ошибка загрузки фида'));
     }
   }
 );
@@ -63,8 +64,8 @@ export const createOrder = createAsyncThunk(
     try {
       const orderData = await orderBurgerApi(ingredientIds);
       return orderData.order;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка создания заказа');
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Ошибка создания заказа'));
     }
   }
 );

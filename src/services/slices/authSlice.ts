@@ -10,6 +10,7 @@ import {
 } from '../../utils/burger-api';
 import { setCookie, getCookie, deleteCookie } from '../../utils/cookie';
 import { TUser } from '@utils-types';
+import { getErrorMessage } from '../../utils/error-handler';
 
 export interface AuthState {
   user: TUser | null;
@@ -56,8 +57,8 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem('refreshToken', response.refreshToken);
 
       return response.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка входа');
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Ошибка входа'));
     }
   }
 );
@@ -71,8 +72,8 @@ export const registerUser = createAsyncThunk(
       setCookie('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       return response.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка регистрации');
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Ошибка регистрации'));
     }
   }
 );
@@ -86,8 +87,8 @@ export const logoutUser = createAsyncThunk(
       deleteCookie('accessToken');
       localStorage.removeItem('refreshToken');
       return null;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка выхода');
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, 'Ошибка выхода'));
     }
   }
 );
@@ -99,8 +100,10 @@ export const updateUser = createAsyncThunk(
     try {
       const response = await updateUserApi(data);
       return response.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка обновления данных');
+    } catch (error: unknown) {
+      return rejectWithValue(
+        getErrorMessage(error, 'Ошибка обновления данных')
+      );
     }
   }
 );

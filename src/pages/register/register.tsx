@@ -3,6 +3,7 @@ import { useDispatch } from '../../services/store';
 import { useNavigate } from 'react-router-dom';
 import { RegisterUI } from '@ui-pages';
 import { registerUser } from '../../services/slices/authSlice';
+import { getErrorMessage } from '../../utils/error-handler';
 
 export const Register: FC = () => {
   const [userName, setUserName] = useState('');
@@ -21,8 +22,8 @@ export const Register: FC = () => {
         registerUser({ email, name: userName, password })
       ).unwrap();
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Ошибка регистрации');
+    } catch (err: unknown) {
+      setError(getErrorMessage(error, 'Ошибка регистрации'));
     }
   };
 
