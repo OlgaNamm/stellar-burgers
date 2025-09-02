@@ -9,7 +9,7 @@ export const FeedUI: FC<FeedUIProps> = memo(({ orders, handleGetFeeds }) => {
   const readyOrders = orders
     .filter((order) => order.status === 'done')
     .map((order) => order.number)
-    .slice(0, 10); // ограничиваем или нет?
+    .slice(0, 10);
 
   const pendingOrders = orders
     .filter((order) => order.status === 'pending')
@@ -17,6 +17,7 @@ export const FeedUI: FC<FeedUIProps> = memo(({ orders, handleGetFeeds }) => {
     .slice(0, 10);
 
   const feedData = {
+    orders: orders, // добавила новое поле
     total: orders.length,
     totalToday: orders.filter((order) => {
       const orderDate = new Date(order.createdAt);
