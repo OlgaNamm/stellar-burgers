@@ -1,11 +1,14 @@
 import { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppHeaderUI } from '@ui';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../services/selectors/authSelectors';
 
 export const AppHeader: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const userName = '';
+  const user = useSelector(selectUser);
+  const userName = user?.name || '';
 
   const handleLinkClick = (path: string) => (e: React.MouseEvent) => {
     e.preventDefault();

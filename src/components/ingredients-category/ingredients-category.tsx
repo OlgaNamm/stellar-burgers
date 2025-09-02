@@ -25,7 +25,7 @@ export const IngredientsCategory = forwardRef<
 
     // Считаем булку
     if (bun) {
-      counters[bun._id] = 1;
+      counters[bun._id] = 2;
     }
 
     return counters;
