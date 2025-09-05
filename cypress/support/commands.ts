@@ -4,3 +4,4 @@ Cypress.Commands.add('setAuthTokens', () => {
   window.localStorage.setItem('accessToken', 'test-access-token');
   cy.setCookie('refreshToken', 'test-refresh-token');
 });
+
